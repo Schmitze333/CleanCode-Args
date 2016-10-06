@@ -29,4 +29,11 @@ class Args
     bool isBoolean(char argChar);
 
     std::string unexpectedArgumentMessage();
+
+    std::string schema;
+    std::string[] args;
+    bool valid;
+    std::set<Character> *unexpectedArguments;
+    std::map<Character, bool> *booleanArgs;
+    int numberOfArguments;
 };
