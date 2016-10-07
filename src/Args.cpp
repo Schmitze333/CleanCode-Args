@@ -1,10 +1,18 @@
 #include "Args.h"
 
-Args::Args(std::string schema, std::string[] args)
+#include <sstream>
+
+Args::Args(std::string schema, std::string args)
 {
-  this->schema = schema;
-  this->args = args;
+  this->schema = SplitString(schema);
+  this->args = SplitString(args);
   valid = parse();
+}
+
+std::vector<std::string> Args::SplitString(std::string s)
+{
+  std::vector<std::string> stringList;
+  return stringList;
 }
 
 bool Args::isValid()
@@ -14,7 +22,7 @@ bool Args::isValid()
 
 bool Args::parse()
 {
-  if (schema.length() == 0 && args.length() == 0)
+  if (schema.size() == 0 && args.size() == 0)
     return true;
 
   parseSchema();
@@ -24,7 +32,8 @@ bool Args::parse()
 
 bool Args::parseSchema()
 {
-  for (std::string element : schema.split(',')) {
+  for (std::string element : schema)
+  {
     parseSchemaElement(element);
   }
   return true;
@@ -39,10 +48,16 @@ void Args::parseSchemaElement(std::string element)
 
 void Args::parseBooleanSchemaElement(std::string element)
 {
-  char c = element.charAt(0);
-  if (Character.isLetter(c)) {
-    booleanArgs.put(c, false);
+  char c = element.at(0);
+  if (isLetter(c)) {
+    booleanArgs[c] = false;
+    // booleanArgs.put(c, false);
   }
+}
+
+bool Args::isLetter(char c)
+{
+  return true;
 }
 
 bool Args::parseArguments()
@@ -50,18 +65,19 @@ bool Args::parseArguments()
   for (std::string arg : args) {
     parseArgument(arg);
   }
+  return true;
 }
 
 void Args::parseArgument(std::string arg)
 {
-  if (arg.startsWith("-"))
+  if (arg[0] == ('-'))
     parseElements(arg);
 }
 
 void Args::parseElements(std::string arg)
 {
-  for (int i = 1; i < arg.length(); ++i)
-    parseElement(arg.charAt(i));
+  for (size_t i = 1; i < arg.size(); ++i)
+    parseElement(arg.at(i));
 }
 
 void Args::parseElement(char argChar)
@@ -71,18 +87,18 @@ void Args::parseElement(char argChar)
     setBooleanArg(argChar, true);
   }
   else {
-    unexpectedArguments.add(argChar);
+    unexpectedArguments.insert(argChar);
   }
 }
 
 void Args::setBooleanArg(char argChar, bool value)
 {
-  booleanArgs.put(argChar, value);
+  booleanArgs[argChar] = value;
 }
 
 bool Args::isBoolean(char argChar)
 {
-  return booleanArgs.containsKey(argChar);
+  return (booleanArgs.find(argChar) == booleanArgs.end());
 }
 
 int Args::cardinality()
@@ -92,10 +108,15 @@ int Args::cardinality()
 
 std::string Args::usage()
 {
-  if (schema.length() > 0)
-    return "-[" + schema + "]";
-  else
-    return "";
+  std::string out = "";
+  if (schema.size() > 0) {
+    out += "-[";
+    for (std::string s : schema) {
+      out += s;
+    }
+    out += "]";
+  }
+  return out;
 }
 
 std::string Args::errorMessage()
@@ -108,15 +129,16 @@ std::string Args::errorMessage()
 
 std::string Args::unexpectedArgumentMessage()
 {
-  std::stringbuffer message = new std::stringbuffer("Argument(s) -");
+  std::ostringstream message;
+  message << "Argument(s) -";
   for (char c : unexpectedArguments) {
-    message.append(c);
+    message << c;
   }
-  message.append(" unexpected.");
-  return message.toString();
+  message << " unexpected.";
+  return message.str();
 }
 
 bool Args::getBoolean(char arg)
 {
-  return booleanArgs.get(arg);
+  return booleanArgs[arg];
 }

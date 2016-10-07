@@ -1,11 +1,14 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <set>
+#include <map>
 
 class Args
 {
   public:
-    Args(std:string schema, std::string[] args);
+    Args(std::string schema, std::string args);
     bool getBoolean(char arg);
     bool isValid();
     int cardinality();
@@ -27,13 +30,15 @@ class Args
 
     void setBooleanArg(char argChar, bool value);
     bool isBoolean(char argChar);
+    bool isLetter(char c);
+    std::vector<std::string> SplitString(std::string s);
 
     std::string unexpectedArgumentMessage();
 
-    std::string schema;
-    std::string[] args;
+    std::vector<std::string> schema;
+    std::vector<std::string> args;
     bool valid;
-    std::set<Character> *unexpectedArguments;
-    std::map<Character, bool> *booleanArgs;
+    std::set<char> unexpectedArguments;
+    std::map<char, bool> booleanArgs;
     int numberOfArguments;
 };
